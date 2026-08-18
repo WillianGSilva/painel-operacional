@@ -143,11 +143,87 @@
             </section>
 
             <section id="page-performance" class="page">
-                <div class="coming-soon">
-                    <span>📊</span>
-                    <h2>Performance dos Portadores</h2>
-                    <p>Estrutura pronta. A próxima API será conectada aqui.</p>
+                <div class="page-heading">
+                    <div>
+                        <p class="section-label">PERFORMANCE</p>
+                        <h2>Performance dos Portadores</h2>
+                        <p>Romaneios 35 e entregas realizadas pelo mesmo usuário durante a janela do romaneio.</p>
+                    </div>
                 </div>
+
+                <section class="filters-panel">
+                    <div class="filter-field">
+                        <label for="perfDataInicio">Data início</label>
+                        <input type="date" id="perfDataInicio">
+                    </div>
+                    <div class="filter-field">
+                        <label for="perfDataFim">Data fim</label>
+                        <input type="date" id="perfDataFim">
+                    </div>
+                    <div class="filter-field">
+                        <label for="perfUnidade">Unidade</label>
+                        <select id="perfUnidade">
+                            <option value="">Todas</option>
+                            <option value="CPSB(Unidade)">CPSB</option>
+                            <option value="BAUB(Unidade)">BAUB</option>
+                            <option value="PPB(Unidade)">PPB</option>
+                            <option value="RAOB(Unidade)">RAOB</option>
+                            <option value="SJPB(Unidade)">SJPB</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label for="perfPortador">Portador</label>
+                        <select id="perfPortador">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <button id="btnBuscarPerformance" class="search-btn" type="button">Buscar</button>
+                </section>
+
+                <div id="perfMensagemErro" class="alert error hidden"></div>
+
+                <div class="kpi-grid performance-kpis">
+                    <article class="kpi-card"><span class="kpi-label">Romaneios 35</span><strong id="perfKpiRomaneios">—</strong></article>
+                    <article class="kpi-card"><span class="kpi-label">Entregas previstas</span><strong id="perfKpiTotal">—</strong></article>
+                    <article class="kpi-card success"><span class="kpi-label">Entregues</span><strong id="perfKpiEntregues">—</strong></article>
+                    <article class="kpi-card danger"><span class="kpi-label">Em aberto</span><strong id="perfKpiAberto">—</strong></article>
+                    <article class="kpi-card performance-card"><span class="kpi-label">Performance geral</span><strong id="perfKpiPerformance">—</strong></article>
+                </div>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Romaneios</h3>
+                            <p>Clique em uma linha para abrir os pedidos do romaneio 35.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap desktop-table">
+                        <table class="performance-table">
+                            <thead>
+                                <tr>
+                                    <th>Unidade</th>
+                                    <th>Portador</th>
+                                    <th>Romaneio 35</th>
+                                    <th>Início</th>
+                                    <th>Fim</th>
+                                    <th>Total</th>
+                                    <th>Entregues</th>
+                                    <th>Aberto</th>
+                                    <th>Performance</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="perfTabelaRomaneios">
+                                <tr><td colspan="10" class="empty-state">Use os filtros e clique em <strong>Buscar</strong>.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="perfMobileCards" class="mobile-cards">
+                        <div class="empty-state">Use os filtros e clique em <strong>Buscar</strong>.</div>
+                    </div>
+                </section>
             </section>
 
             <section id="page-notas" class="page">
@@ -239,6 +315,46 @@
                             </tr>
                         </thead>
                         <tbody id="detTabelaRotas"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </aside>
+
+
+
+    <div id="perfDrawerOverlay" class="drawer-overlay hidden"></div>
+    <aside id="perfDrawer" class="transfer-drawer" aria-hidden="true">
+        <div class="drawer-header">
+            <div>
+                <p class="section-label">DETALHE DO ROMANEIO 35</p>
+                <h2 id="perfDrawerTitulo">—</h2>
+                <p id="perfDrawerSubtitulo">—</p>
+            </div>
+            <button id="btnFecharPerfDrawer" class="drawer-close" type="button" aria-label="Fechar">×</button>
+        </div>
+
+        <div id="perfDrawerLoading" class="drawer-loading hidden">Consultando pedidos do romaneio...</div>
+        <div id="perfDrawerErro" class="alert error hidden"></div>
+
+        <div id="perfDrawerConteudo" class="drawer-content hidden">
+            <div class="detail-kpis performance-detail-kpis">
+                <article><span>Total</span><strong id="perfDetTotal">0</strong></article>
+                <article><span>Entregues</span><strong id="perfDetEntregues">0</strong></article>
+                <article><span>Em aberto</span><strong id="perfDetAberto">0</strong></article>
+                <article><span>Performance</span><strong id="perfDetPerformance">0%</strong></article>
+            </div>
+
+            <section class="detail-section">
+                <div class="detail-title-row">
+                    <div><h3>Pedidos</h3><p>Em aberto aparecem primeiro.</p></div>
+                </div>
+                <div class="detail-table-wrap">
+                    <table class="detail-table performance-detail-table">
+                        <thead>
+                            <tr><th>Status</th><th>Nota</th><th>Cidade</th><th>Baixa</th><th>Romaneio entrega</th></tr>
+                        </thead>
+                        <tbody id="perfTabelaPedidos"></tbody>
                     </table>
                 </div>
             </section>

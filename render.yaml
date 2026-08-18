@@ -9,3 +9,7 @@ services:
         sync: false
       - key: N8N_TRANSFERENCIAS_DETALHE_URL
         sync: false
+      - key: N8N_PERFORMANCE_PORTADORES_URL
+        sync: false
+      - key: N8N_PERFORMANCE_ROMANEIO_DETALHE_URL
+        sync: false

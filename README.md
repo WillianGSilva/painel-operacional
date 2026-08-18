@@ -46,3 +46,11 @@ N8N_TRANSFERENCIAS_URL=http://204.216.191.191:5678/webhook/transferencias-campin
 O front não consulta diretamente o n8n. O navegador chama `/api/transferencias` no Flask e o Flask consulta o n8n.
 
 Os dados só são atualizados quando o usuário clica em **Atualizar dados**.
+
+
+## Performance - variáveis no Render
+
+```text
+N8N_PERFORMANCE_PORTADORES_URL=http://204.216.191.191:5678/webhook/performance-portadores
+N8N_PERFORMANCE_ROMANEIO_DETALHE_URL=http://204.216.191.191:5678/webhook/performance-romaneio-detalhe
+```

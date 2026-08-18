@@ -25,6 +25,8 @@ navItems.forEach((button) => {
 btnAtualizar.addEventListener("click", () => {
     if (state.pagina === "transferencias") {
         carregarTransferencias();
+    } else if (state.pagina === "performance") {
+        carregarPerformance();
     }
 });
 
@@ -471,4 +473,111 @@ async function carregarDetalheTransferencia(romaneio, origem, placa) {
     } finally {
         document.getElementById("drawerLoading").classList.add("hidden");
     }
+}
+
+
+// =====================================================
+// PERFORMANCE DOS PORTADORES
+// =====================================================
+const perfDataInicio=document.getElementById("perfDataInicio");
+const perfDataFim=document.getElementById("perfDataFim");
+const perfUnidade=document.getElementById("perfUnidade");
+const perfPortador=document.getElementById("perfPortador");
+const btnBuscarPerformance=document.getElementById("btnBuscarPerformance");
+const perfMensagemErro=document.getElementById("perfMensagemErro");
+const perfDrawerOverlay=document.getElementById("perfDrawerOverlay");
+const perfDrawer=document.getElementById("perfDrawer");
+const btnFecharPerfDrawer=document.getElementById("btnFecharPerfDrawer");
+
+function dataLocalISO(){return new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date())}
+if(perfDataInicio&&!perfDataInicio.value)perfDataInicio.value=dataLocalISO();
+if(perfDataFim&&!perfDataFim.value)perfDataFim.value=dataLocalISO();
+
+function classePerformance(valor){const n=Number(valor||0);if(n>=90)return"good";if(n>=80)return"mid";return"bad"}
+function formatarPercentual(valor){return`${Number(valor||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}%`}
+function limparUnidadePerformance(valor){return String(valor||"").replace("(Unidade)","").trim()}
+
+function renderPerformanceResumo(resumo){
+document.getElementById("perfKpiRomaneios").textContent=formatarNumero(resumo.romaneios);
+document.getElementById("perfKpiTotal").textContent=formatarNumero(resumo.total_entregas);
+document.getElementById("perfKpiEntregues").textContent=formatarNumero(resumo.entregues);
+document.getElementById("perfKpiAberto").textContent=formatarNumero(resumo.em_aberto);
+document.getElementById("perfKpiPerformance").textContent=formatarPercentual(resumo.performance);
+}
+
+function atualizarPortadoresPerformance(portadores){
+const valorAtual=perfPortador.value;
+perfPortador.innerHTML=`<option value="">Todos</option>`+(portadores||[]).map(p=>`<option value="${p.id}">${String(p.nome||p.id).trim()}</option>`).join("");
+if([...perfPortador.options].some(o=>o.value===valorAtual))perfPortador.value=valorAtual;
+}
+
+function renderTabelaPerformance(romaneios){
+const tbody=document.getElementById("perfTabelaRomaneios");
+if(!romaneios.length){tbody.innerHTML=`<tr><td colspan="10" class="empty-state">Nenhum romaneio encontrado para os filtros selecionados.</td></tr>`;return}
+tbody.innerHTML=romaneios.map(r=>`
+<tr data-performance-romaneio="${r.lista_35||""}" data-performance-portador="${String(r.portador||"").trim()}" data-performance-unidade="${r.unidade||""}">
+<td><strong>${limparUnidadePerformance(r.unidade)}</strong></td>
+<td>${String(r.portador||"—").trim()}</td>
+<td class="romaneio" title="${r.lista_35||""}">${r.lista_35||"—"}</td>
+<td>${formatarDataHora(r.inicio_35)}</td><td>${formatarDataHora(r.fim_35)}</td>
+<td>${formatarNumero(r.total_entregas)}</td><td>${formatarNumero(r.entregues)}</td><td><strong>${formatarNumero(r.em_aberto)}</strong></td>
+<td><span class="performance-badge ${classePerformance(r.performance)}">${formatarPercentual(r.performance)}</span></td>
+<td><span class="romaneio-status ${r.status_romaneio==="EM ROTA"?"rota":"finalizado"}">${r.status_romaneio||"—"}</span></td>
+</tr>`).join("");
+}
+
+function renderPerformanceMobile(romaneios){
+const container=document.getElementById("perfMobileCards");
+if(!romaneios.length){container.innerHTML=`<div class="empty-state">Nenhum romaneio encontrado.</div>`;return}
+container.innerHTML=romaneios.map(r=>`
+<article class="vehicle-card" data-performance-romaneio="${r.lista_35||""}" data-performance-portador="${String(r.portador||"").trim()}" data-performance-unidade="${r.unidade||""}">
+<div class="vehicle-card-header"><div><div class="vehicle-card-title">${String(r.portador||"—").trim()}</div><small>${limparUnidadePerformance(r.unidade)} • ${r.lista_35||"—"}</small></div><span class="performance-badge ${classePerformance(r.performance)}">${formatarPercentual(r.performance)}</span></div>
+<div class="vehicle-grid"><div class="vehicle-field"><small>Total</small><strong>${formatarNumero(r.total_entregas)}</strong></div><div class="vehicle-field"><small>Entregues</small><strong>${formatarNumero(r.entregues)}</strong></div><div class="vehicle-field"><small>Em aberto</small><strong>${formatarNumero(r.em_aberto)}</strong></div><div class="vehicle-field"><small>Status</small><strong>${r.status_romaneio||"—"}</strong></div></div>
+</article>`).join("");
+}
+
+async function carregarPerformance(){
+perfMensagemErro.classList.add("hidden");perfMensagemErro.textContent="";
+btnBuscarPerformance.disabled=true;btnBuscarPerformance.textContent="Buscando...";
+const params=new URLSearchParams({data_inicio:perfDataInicio.value,data_fim:perfDataFim.value,unidade:perfUnidade.value,portador:perfPortador.value});
+try{
+const response=await fetch(`/api/performance?${params.toString()}`,{cache:"no-store"});
+const data=await response.json();
+if(!response.ok||data.erro)throw new Error(data.mensagem||"Erro ao consultar a performance.");
+renderPerformanceResumo(data.resumo||{});atualizarPortadoresPerformance(data.portadores||[]);renderTabelaPerformance(data.romaneios||[]);renderPerformanceMobile(data.romaneios||[]);
+document.getElementById("ultimaAtualizacao").textContent=data.atualizado_em||new Date().toLocaleString("pt-BR");
+}catch(error){perfMensagemErro.textContent=error.message;perfMensagemErro.classList.remove("hidden")}
+finally{btnBuscarPerformance.disabled=false;btnBuscarPerformance.textContent="Buscar"}
+}
+btnBuscarPerformance?.addEventListener("click",carregarPerformance);
+
+function abrirPerfDrawerVisual(){perfDrawerOverlay.classList.remove("hidden");perfDrawer.classList.add("open");perfDrawer.setAttribute("aria-hidden","false");document.body.style.overflow="hidden"}
+function fecharPerfDrawer(){perfDrawer.classList.remove("open");perfDrawer.setAttribute("aria-hidden","true");perfDrawerOverlay.classList.add("hidden");document.body.style.overflow=""}
+btnFecharPerfDrawer?.addEventListener("click",fecharPerfDrawer);perfDrawerOverlay?.addEventListener("click",fecharPerfDrawer);
+
+document.addEventListener("click",event=>{const alvo=event.target.closest("[data-performance-romaneio]");if(!alvo)return;carregarDetalhePerformance(alvo.dataset.performanceRomaneio,alvo.dataset.performancePortador,alvo.dataset.performanceUnidade)});
+
+function renderPedidosPerformance(pedidos){
+const tbody=document.getElementById("perfTabelaPedidos");
+if(!pedidos.length){tbody.innerHTML=`<tr><td colspan="5" class="empty-state">Nenhum pedido encontrado.</td></tr>`;return}
+tbody.innerHTML=pedidos.map(p=>`
+<tr><td><span class="order-status ${p.status==="ENTREGUE"?"entregue":"aberto"}">${p.status==="ENTREGUE"?"Entregue":"Em aberto"}</span></td><td><strong>${p.numerocontrole||"—"}</strong></td><td>${p.cidade||"—"}${p.uf?`/${p.uf}`:""}</td><td>${formatarDataHora(p.data_baixa)}</td><td class="romaneio" title="${p.romaneio_entrega||""}">${p.romaneio_entrega||"—"}</td></tr>`).join("");
+}
+
+async function carregarDetalhePerformance(romaneio,portador,unidade){
+if(!romaneio)return;abrirPerfDrawerVisual();
+document.getElementById("perfDrawerTitulo").textContent=String(portador||"Portador").trim();
+document.getElementById("perfDrawerSubtitulo").textContent=`${limparUnidadePerformance(unidade)} • ${romaneio}`;
+document.getElementById("perfDrawerErro").classList.add("hidden");document.getElementById("perfDrawerConteudo").classList.add("hidden");document.getElementById("perfDrawerLoading").classList.remove("hidden");
+try{
+const response=await fetch(`/api/performance/detalhe?romaneio=${encodeURIComponent(romaneio)}`,{cache:"no-store"});
+const data=await response.json();
+if(!response.ok||data.erro)throw new Error(data.mensagem||"Erro ao consultar o romaneio.");
+document.getElementById("perfDetTotal").textContent=formatarNumero(data.resumo?.total);
+document.getElementById("perfDetEntregues").textContent=formatarNumero(data.resumo?.entregues);
+document.getElementById("perfDetAberto").textContent=formatarNumero(data.resumo?.em_aberto);
+document.getElementById("perfDetPerformance").textContent=formatarPercentual(data.resumo?.performance);
+renderPedidosPerformance(data.pedidos||[]);document.getElementById("perfDrawerConteudo").classList.remove("hidden");
+}catch(error){const el=document.getElementById("perfDrawerErro");el.textContent=error.message;el.classList.remove("hidden")}
+finally{document.getElementById("perfDrawerLoading").classList.add("hidden")}
 }
