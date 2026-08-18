@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Operacional</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">GESTÃO OPERACIONAL</p>
+                <h1>Painel Operacional</h1>
+                <p class="last-update">
+                    Última atualização:
+                    <strong id="ultimaAtualizacao">—</strong>
+                </p>
+            </div>
+
+            <button id="btnAtualizar" class="refresh-btn" type="button">
+                <span class="refresh-icon">↻</span>
+                <span id="textoAtualizar">Atualizar dados</span>
+            </button>
+        </header>
+
+        <nav class="main-nav" aria-label="Navegação principal">
+            <button class="nav-item active" data-page="transferencias">
+                <span class="nav-icon">🚛</span>
+                <span>Transferências</span>
+            </button>
+
+            <button class="nav-item" data-page="performance">
+                <span class="nav-icon">📊</span>
+                <span>Performance</span>
+            </button>
+
+            <button class="nav-item" data-page="notas">
+                <span class="nav-icon">📦</span>
+                <span>Notas abertas</span>
+            </button>
+        </nav>
+
+        <main>
+            <section id="page-transferencias" class="page active">
+                <div class="page-heading">
+                    <div>
+                        <p class="section-label">TRANSFERÊNCIAS</p>
+                        <h2>Chegadas em Campinas</h2>
+                        <p>Veículos com previsão de chegada ao HUB CPSZ hoje.</p>
+                    </div>
+                </div>
+
+                <div id="mensagemErro" class="alert error hidden"></div>
+
+                <div class="kpi-grid">
+                    <article class="kpi-card">
+                        <span class="kpi-label">Previstas hoje</span>
+                        <strong id="kpiTotal">—</strong>
+                    </article>
+
+                    <article class="kpi-card success">
+                        <span class="kpi-label">Chegaram</span>
+                        <strong id="kpiChegaram">—</strong>
+                    </article>
+
+                    <article class="kpi-card warning">
+                        <span class="kpi-label">Em trânsito</span>
+                        <strong id="kpiTransito">—</strong>
+                    </article>
+
+                    <article class="kpi-card danger">
+                        <span class="kpi-label">Atrasadas</span>
+                        <strong id="kpiAtrasados">—</strong>
+                    </article>
+                </div>
+
+                <div class="secondary-kpis">
+                    <article class="wide-kpi">
+                        <div>
+                            <span class="wide-icon">🧾</span>
+                            <span class="kpi-label">Notas pendentes</span>
+                        </div>
+                        <strong id="kpiNotas">—</strong>
+                    </article>
+
+                    <article class="wide-kpi">
+                        <div>
+                            <span class="wide-icon">📦</span>
+                            <span class="kpi-label">Volumes pendentes</span>
+                        </div>
+                        <strong id="kpiVolumes">—</strong>
+                    </article>
+                </div>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Transferências do dia</h3>
+                            <p>Atrasadas aparecem primeiro.</p>
+                        </div>
+
+                        <div class="legend">
+                            <span><i class="dot danger-dot"></i>Atrasado</span>
+                            <span><i class="dot warning-dot"></i>Em trânsito</span>
+                            <span><i class="dot success-dot"></i>Chegou</span>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap desktop-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Origem</th>
+                                    <th>Placa</th>
+                                    <th>Romaneio</th>
+                                    <th>Saída</th>
+                                    <th>Previsão</th>
+                                    <th>Chegada</th>
+                                    <th>Notas</th>
+                                    <th>Volumes</th>
+                                    <th>Atraso</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaTransferencias">
+                                <tr>
+                                    <td colspan="10" class="empty-state">
+                                        Clique em <strong>Atualizar dados</strong> para consultar.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="mobileCards" class="mobile-cards">
+                        <div class="empty-state">
+                            Clique em <strong>Atualizar dados</strong> para consultar.
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <section id="page-performance" class="page">
+                <div class="coming-soon">
+                    <span>📊</span>
+                    <h2>Performance dos Portadores</h2>
+                    <p>Estrutura pronta. A próxima API será conectada aqui.</p>
+                </div>
+            </section>
+
+            <section id="page-notas" class="page">
+                <div class="coming-soon">
+                    <span>📦</span>
+                    <h2>Notas em Aberto</h2>
+                    <p>Estrutura pronta. A próxima API será conectada aqui.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
