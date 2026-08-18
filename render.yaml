@@ -7,3 +7,5 @@ services:
     envVars:
       - key: N8N_TRANSFERENCIAS_URL
         sync: false
+      - key: N8N_TRANSFERENCIAS_DETALHE_URL
+        sync: false

@@ -160,6 +160,92 @@
         </main>
     </div>
 
+
+    <div id="drawerOverlay" class="drawer-overlay hidden"></div>
+
+    <aside id="transferDrawer" class="transfer-drawer" aria-hidden="true">
+        <div class="drawer-header">
+            <div>
+                <p class="section-label">DETALHE DA TRANSFERÊNCIA</p>
+                <h2 id="drawerTitulo">—</h2>
+                <p id="drawerSubtitulo">—</p>
+            </div>
+            <button id="btnFecharDrawer" class="drawer-close" type="button" aria-label="Fechar">×</button>
+        </div>
+
+        <div id="drawerLoading" class="drawer-loading hidden">
+            Consultando composição da transferência...
+        </div>
+
+        <div id="drawerErro" class="alert error hidden"></div>
+
+        <div id="drawerConteudo" class="drawer-content hidden">
+            <div class="detail-kpis">
+                <article>
+                    <span>Unidades</span>
+                    <strong id="detUnidades">0</strong>
+                </article>
+                <article>
+                    <span>Notas</span>
+                    <strong id="detNotas">0</strong>
+                </article>
+                <article>
+                    <span>Volumes</span>
+                    <strong id="detVolumes">0</strong>
+                </article>
+            </div>
+
+            <section class="detail-section">
+                <div class="detail-title-row">
+                    <div>
+                        <h3>Unidades</h3>
+                        <p>Distribuição da carga por unidade de entrega.</p>
+                    </div>
+                </div>
+
+                <div class="detail-table-wrap">
+                    <table class="detail-table">
+                        <thead>
+                            <tr>
+                                <th>Unidade</th>
+                                <th>Notas</th>
+                                <th>Volumes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detTabelaUnidades"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="detail-section">
+                <div class="detail-title-row routes-title">
+                    <div>
+                        <h3>Rotas</h3>
+                        <p><span id="detQtdRotas">0</span> rotas encontradas.</p>
+                    </div>
+
+                    <select id="filtroUnidadeRota" class="route-filter">
+                        <option value="">Todas as unidades</option>
+                    </select>
+                </div>
+
+                <div class="detail-table-wrap">
+                    <table class="detail-table">
+                        <thead>
+                            <tr>
+                                <th>Rota</th>
+                                <th>Notas</th>
+                                <th>Volumes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detTabelaRotas"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </aside>
+
+
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

@@ -182,7 +182,7 @@ function renderTabela(transferencias) {
         const status = statusInfo(t.status);
 
         return `
-            <tr>
+            <tr data-romaneio="${t.romaneio || ""}" data-origem="${t.origem || ""}" data-placa="${t.placa || ""}">
                 <td>
                     <span class="status-badge ${status.classe}">
                         ${status.ponto} ${status.texto}
@@ -237,7 +237,7 @@ function renderMobileCards(transferencias) {
         const status = statusInfo(t.status);
 
         return `
-            <article class="vehicle-card">
+            <article class="vehicle-card" data-romaneio="${t.romaneio || ""}" data-origem="${t.origem || ""}" data-placa="${t.placa || ""}">
                 <div class="vehicle-card-header">
                     <div>
                         <div class="vehicle-card-title">
@@ -325,5 +325,150 @@ async function carregarTransferencias() {
     } finally {
         btnAtualizar.disabled = false;
         textoAtualizar.textContent = "Atualizar dados";
+    }
+}
+
+
+let rotasDetalheAtual = [];
+
+const drawerOverlay = document.getElementById("drawerOverlay");
+const transferDrawer = document.getElementById("transferDrawer");
+const btnFecharDrawer = document.getElementById("btnFecharDrawer");
+const filtroUnidadeRota = document.getElementById("filtroUnidadeRota");
+
+function abrirDrawerVisual() {
+    drawerOverlay.classList.remove("hidden");
+    transferDrawer.classList.add("open");
+    transferDrawer.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+}
+
+function fecharDrawer() {
+    transferDrawer.classList.remove("open");
+    transferDrawer.setAttribute("aria-hidden", "true");
+    drawerOverlay.classList.add("hidden");
+    document.body.style.overflow = "";
+}
+
+btnFecharDrawer.addEventListener("click", fecharDrawer);
+drawerOverlay.addEventListener("click", fecharDrawer);
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") fecharDrawer();
+});
+
+document.addEventListener("click", (event) => {
+    const alvo = event.target.closest("[data-romaneio]");
+    if (!alvo) return;
+
+    const romaneio = alvo.dataset.romaneio;
+    const origem = alvo.dataset.origem;
+    const placa = alvo.dataset.placa;
+
+    if (romaneio) {
+        carregarDetalheTransferencia(romaneio, origem, placa);
+    }
+});
+
+filtroUnidadeRota.addEventListener("change", () => {
+    renderRotasDetalhe(filtroUnidadeRota.value);
+});
+
+function renderUnidadesDetalhe(unidades) {
+    const tbody = document.getElementById("detTabelaUnidades");
+
+    tbody.innerHTML = unidades.map((u) => `
+        <tr>
+            <td><strong>${u.unidade}</strong></td>
+            <td>${formatarNumero(u.notas)}</td>
+            <td>${formatarNumero(u.volumes)}</td>
+        </tr>
+    `).join("");
+}
+
+function renderRotasDetalhe(unidade = "") {
+    const tbody = document.getElementById("detTabelaRotas");
+
+    const lista = unidade
+        ? rotasDetalheAtual.filter((r) => r.unidade === unidade)
+        : rotasDetalheAtual;
+
+    document.getElementById("detQtdRotas").textContent =
+        formatarNumero(lista.length);
+
+    if (!lista.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="3" class="empty-state">Nenhuma rota encontrada.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = lista.map((r) => `
+        <tr>
+            <td><strong>${r.rota}</strong></td>
+            <td>${formatarNumero(r.notas)}</td>
+            <td>${formatarNumero(r.volumes)}</td>
+        </tr>
+    `).join("");
+}
+
+function preencherFiltroUnidades(unidades) {
+    filtroUnidadeRota.innerHTML =
+        `<option value="">Todas as unidades</option>` +
+        unidades.map((u) =>
+            `<option value="${u.unidade}">${u.unidade}</option>`
+        ).join("");
+}
+
+async function carregarDetalheTransferencia(romaneio, origem, placa) {
+    abrirDrawerVisual();
+
+    document.getElementById("drawerTitulo").textContent =
+        `${normalizarOrigem(origem)} → CPS`;
+
+    document.getElementById("drawerSubtitulo").textContent =
+        `${placa || "Sem placa"} • ${romaneio}`;
+
+    document.getElementById("drawerErro").classList.add("hidden");
+    document.getElementById("drawerConteudo").classList.add("hidden");
+    document.getElementById("drawerLoading").classList.remove("hidden");
+
+    try {
+        const response = await fetch(
+            `/api/transferencias/detalhe?romaneio=${encodeURIComponent(romaneio)}`,
+            { cache: "no-store" }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || data.erro) {
+            throw new Error(data.mensagem || "Erro ao consultar o detalhe.");
+        }
+
+        document.getElementById("detUnidades").textContent =
+            formatarNumero(data.resumo?.unidades);
+
+        document.getElementById("detNotas").textContent =
+            formatarNumero(data.resumo?.notas);
+
+        document.getElementById("detVolumes").textContent =
+            formatarNumero(data.resumo?.volumes);
+
+        rotasDetalheAtual = data.rotas || [];
+
+        renderUnidadesDetalhe(data.unidades || []);
+        preencherFiltroUnidades(data.unidades || []);
+        renderRotasDetalhe("");
+
+        document.getElementById("drawerConteudo").classList.remove("hidden");
+
+    } catch (error) {
+        const el = document.getElementById("drawerErro");
+        el.textContent = error.message;
+        el.classList.remove("hidden");
+    } finally {
+        document.getElementById("drawerLoading").classList.add("hidden");
     }
 }
