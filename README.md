@@ -54,3 +54,10 @@ Os dados só são atualizados quando o usuário clica em **Atualizar dados**.
 N8N_PERFORMANCE_PORTADORES_URL=http://204.216.191.191:5678/webhook/performance-portadores
 N8N_PERFORMANCE_ROMANEIO_DETALHE_URL=http://204.216.191.191:5678/webhook/performance-romaneio-detalhe
 ```
+
+
+## Composição por Sub-região
+
+```text
+N8N_COMPOSICAO_SUBREGIOES_URL=http://204.216.191.191:5678/webhook/composicao-subregioes
+```

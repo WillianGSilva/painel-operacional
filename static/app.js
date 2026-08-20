@@ -24,7 +24,12 @@ navItems.forEach((button) => {
 
 btnAtualizar.addEventListener("click", () => {
     if (state.pagina === "transferencias") {
-        carregarTransferencias();
+        const compAtiva = document.getElementById("transferViewComposicao")?.classList.contains("active");
+        if (compAtiva) {
+            carregarComposicaoSubregioes();
+        } else {
+            carregarTransferencias();
+        }
     } else if (state.pagina === "performance") {
         carregarPerformance();
     }
@@ -581,3 +586,140 @@ renderPedidosPerformance(data.pedidos||[]);document.getElementById("perfDrawerCo
 }catch(error){const el=document.getElementById("perfDrawerErro");el.textContent=error.message;el.classList.remove("hidden")}
 finally{document.getElementById("perfDrawerLoading").classList.add("hidden")}
 }
+
+
+// =====================================================
+// COMPOSICAO POR SUB-REGIAO
+// =====================================================
+const transferSubviewTabs = document.querySelectorAll("[data-transfer-view]");
+const transferViewLista = document.getElementById("transferViewLista");
+const transferViewComposicao = document.getElementById("transferViewComposicao");
+const compUnidade = document.getElementById("compUnidade");
+const btnBuscarComposicao = document.getElementById("btnBuscarComposicao");
+const compMensagemErro = document.getElementById("compMensagemErro");
+
+transferSubviewTabs.forEach(btn => {
+    btn.addEventListener("click", () => {
+        transferSubviewTabs.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const view = btn.dataset.transferView;
+        transferViewLista.classList.toggle("active", view === "lista");
+        transferViewComposicao.classList.toggle("active", view === "composicao");
+    });
+});
+
+function statusComposicaoInfo(status){
+    const mapa = {
+        "COMPLETA": ["completa", "Completa"],
+        "EM RECEBIMENTO": ["recebimento", "Em recebimento"],
+        "COM PENDENCIA": ["pendencia", "Com pendência"],
+        "AGUARDANDO": ["aguardando", "Aguardando"]
+    };
+    return mapa[status] || ["aguardando", status || "—"];
+}
+
+function origemCurta(valor){
+    return String(valor || "")
+        .replace("-SC(HUB)","")
+        .replace("-PR(HUB)","")
+        .replace("-MG(HUB)","")
+        .replace("-ES(HUB)","")
+        .replace("-RJ(HUB)","")
+        .replace("-SP(HUB)","")
+        .replace("(HUB)","");
+}
+
+function renderResumoComposicao(subregioes){
+    const contar = status => subregioes.filter(s => s.status === status).length;
+    document.getElementById("compKpiTotal").textContent = formatarNumero(subregioes.length);
+    document.getElementById("compKpiCompletas").textContent = formatarNumero(contar("COMPLETA"));
+    document.getElementById("compKpiRecebimento").textContent = formatarNumero(contar("EM RECEBIMENTO"));
+    document.getElementById("compKpiAguardando").textContent = formatarNumero(contar("AGUARDANDO"));
+    document.getElementById("compKpiPendencia").textContent = formatarNumero(contar("COM PENDENCIA"));
+}
+
+function renderComposicao(subregioes){
+    const grid = document.getElementById("compositionGrid");
+
+    if(!subregioes.length){
+        grid.innerHTML = `<div class="empty-state">Nenhuma sub-região encontrada.</div>`;
+        return;
+    }
+
+    grid.innerHTML = subregioes.map(s => {
+        const [classe, texto] = statusComposicaoInfo(s.status);
+        const transferencias = [...(s.transferencias || [])].sort((a,b) =>
+            String(a.previsao_chegada || "").localeCompare(String(b.previsao_chegada || ""))
+        );
+
+        return `
+        <article class="composition-card">
+            <div class="composition-card-header">
+                <div>
+                    <div class="composition-card-title">
+                        <h3>${s.rota}</h3>
+                        <span class="composition-status ${classe}">${texto}</span>
+                    </div>
+                    <div class="composition-meta">
+                        ${formatarNumero(s.notas)} notas • ${formatarNumero(s.volumes)} volumes •
+                        ${formatarNumero(s.qtd_transferencias)} transferências
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-list">
+                <div class="timeline-row timeline-head">
+                    <div>Origem</div><div>Romaneio</div><div>Previsão</div>
+                    <div>Status</div><div>Notas</div><div>Volumes</div>
+                </div>
+                ${transferencias.map(t => `
+                    <div class="timeline-row">
+                        <div class="timeline-route">${origemCurta(t.origem)} → CPS</div>
+                        <div class="romaneio" title="${t.romaneio || ""}">${t.romaneio || "—"}</div>
+                        <div>${formatarSomenteHora(t.previsao_chegada)}</div>
+                        <div class="timeline-status ${t.status === "CHEGOU" ? "chegou" : t.status === "ATRASADO" ? "atrasado" : "transito"}">
+                            ${t.status === "CHEGOU" ? "Chegou" : t.status === "ATRASADO" ? "Atrasado" : "Em trânsito"}
+                        </div>
+                        <div>${formatarNumero(t.notas)}</div>
+                        <div>${formatarNumero(t.volumes)}</div>
+                    </div>
+                `).join("")}
+            </div>
+        </article>`;
+    }).join("");
+}
+
+async function carregarComposicaoSubregioes(){
+    compMensagemErro.classList.add("hidden");
+    compMensagemErro.textContent = "";
+
+    btnBuscarComposicao.disabled = true;
+    btnBuscarComposicao.textContent = "Buscando...";
+
+    try{
+        const response = await fetch(
+            `/api/composicao-subregioes?unidade=${encodeURIComponent(compUnidade.value)}`,
+            {cache:"no-store"}
+        );
+        const data = await response.json();
+
+        if(!response.ok || data.erro){
+            throw new Error(data.mensagem || "Erro ao consultar composição.");
+        }
+
+        renderResumoComposicao(data.subregioes || []);
+        renderComposicao(data.subregioes || []);
+        document.getElementById("ultimaAtualizacao").textContent =
+            data.atualizado_em || new Date().toLocaleString("pt-BR");
+
+    }catch(error){
+        compMensagemErro.textContent = error.message;
+        compMensagemErro.classList.remove("hidden");
+    }finally{
+        btnBuscarComposicao.disabled = false;
+        btnBuscarComposicao.textContent = "Buscar";
+    }
+}
+
+btnBuscarComposicao?.addEventListener("click", carregarComposicaoSubregioes);

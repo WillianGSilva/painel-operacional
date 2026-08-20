@@ -52,8 +52,14 @@
                     </div>
                 </div>
 
+                <div id="transferViewTabs" class="subview-tabs">
+                    <button class="subview-tab active" data-transfer-view="lista">Visão de Transferências</button>
+                    <button class="subview-tab" data-transfer-view="composicao">Composição por Sub-região</button>
+                </div>
+
                 <div id="mensagemErro" class="alert error hidden"></div>
 
+                <div id="transferViewLista" class="transfer-subview active">
                 <div class="kpi-grid">
                     <article class="kpi-card">
                         <span class="kpi-label">Previstas hoje</span>
@@ -140,6 +146,40 @@
                         </div>
                     </div>
                 </section>
+                </div>
+
+                <div id="transferViewComposicao" class="transfer-subview">
+                    <section class="composition-toolbar">
+                        <div class="filter-field">
+                            <label for="compUnidade">Unidade</label>
+                            <select id="compUnidade">
+                                <option value="CPS">CPS</option>
+                                <option value="ABC">ABC</option>
+                                <option value="LIT">LIT</option>
+                                <option value="SJK">SJK</option>
+                                <option value="SPC">SPC</option>
+                                <option value="SPL">SPL</option>
+                                <option value="SPO">SPO</option>
+                                <option value="SPS">SPS</option>
+                            </select>
+                        </div>
+                        <button id="btnBuscarComposicao" class="search-btn" type="button">Buscar</button>
+                    </section>
+
+                    <div id="compMensagemErro" class="alert error hidden"></div>
+
+                    <div class="kpi-grid composition-kpis">
+                        <article class="kpi-card"><span class="kpi-label">Sub-regiões</span><strong id="compKpiTotal">—</strong></article>
+                        <article class="kpi-card success"><span class="kpi-label">Completas</span><strong id="compKpiCompletas">—</strong></article>
+                        <article class="kpi-card warning"><span class="kpi-label">Em recebimento</span><strong id="compKpiRecebimento">—</strong></article>
+                        <article class="kpi-card"><span class="kpi-label">Aguardando</span><strong id="compKpiAguardando">—</strong></article>
+                        <article class="kpi-card danger"><span class="kpi-label">Com pendência</span><strong id="compKpiPendencia">—</strong></article>
+                    </div>
+
+                    <div id="compositionGrid" class="composition-grid">
+                        <div class="empty-state">Selecione uma unidade e clique em <strong>Buscar</strong>.</div>
+                    </div>
+                </div>
             </section>
 
             <section id="page-performance" class="page">

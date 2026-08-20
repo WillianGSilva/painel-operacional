@@ -24,6 +24,11 @@ N8N_PERFORMANCE_ROMANEIO_DETALHE_URL = os.getenv(
     "http://204.216.191.191:5678/webhook/performance-romaneio-detalhe"
 )
 
+N8N_COMPOSICAO_SUBREGIOES_URL = os.getenv(
+    "N8N_COMPOSICAO_SUBREGIOES_URL",
+    "http://204.216.191.191:5678/webhook/composicao-subregioes"
+)
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -146,6 +151,44 @@ def api_performance_detalhe():
     except ValueError:
         return jsonify({"erro": True, "mensagem": "O n8n retornou uma resposta inválida no detalhe de performance."}), 502
 
+
+
+@app.route("/api/composicao-subregioes")
+def api_composicao_subregioes():
+    from flask import request
+
+    unidade = (request.args.get("unidade") or "").strip().upper()
+
+    if not unidade:
+        return jsonify({"erro": True, "mensagem": "Unidade não informada."}), 400
+
+    try:
+        response = requests.get(
+            N8N_COMPOSICAO_SUBREGIOES_URL,
+            params={"unidade": unidade},
+            timeout=90
+        )
+        response.raise_for_status()
+        return jsonify(response.json())
+
+    except requests.exceptions.Timeout:
+        return jsonify({
+            "erro": True,
+            "mensagem": "A consulta de composição demorou mais do que o esperado."
+        }), 504
+
+    except requests.exceptions.RequestException as exc:
+        return jsonify({
+            "erro": True,
+            "mensagem": "Não foi possível consultar a composição no n8n.",
+            "detalhe": str(exc)
+        }), 502
+
+    except ValueError:
+        return jsonify({
+            "erro": True,
+            "mensagem": "O n8n retornou uma resposta inválida na composição."
+        }), 502
 
 @app.route("/api/health")
 def health():

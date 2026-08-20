@@ -13,3 +13,5 @@ services:
         sync: false
       - key: N8N_PERFORMANCE_ROMANEIO_DETALHE_URL
         sync: false
+      - key: N8N_COMPOSICAO_SUBREGIOES_URL
+        sync: false

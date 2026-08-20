@@ -755,3 +755,73 @@ tbody tr[data-romaneio]:hover {
 #perfTabelaRomaneios tr[data-performance-romaneio]:hover{background:var(--primary-soft)}
 @media(max-width:1100px){.filters-panel{grid-template-columns:repeat(2,1fr)}.search-btn{grid-column:span 2}.performance-kpis{grid-template-columns:repeat(2,1fr)}.performance-card{grid-column:span 2}}
 @media(max-width:600px){.filters-panel{grid-template-columns:1fr}.search-btn{grid-column:auto}.performance-kpis{grid-template-columns:repeat(2,1fr)}.performance-card{grid-column:span 2}.performance-detail-kpis{grid-template-columns:repeat(2,1fr)}}
+
+
+/* Composition Subregions */
+.subview-tabs{
+    display:inline-flex;gap:6px;padding:5px;margin-bottom:18px;
+    border:1px solid var(--border);border-radius:12px;background:var(--surface)
+}
+.subview-tab{
+    border:0;background:transparent;color:var(--muted);font-weight:800;
+    padding:9px 13px;border-radius:9px;cursor:pointer
+}
+.subview-tab.active{background:var(--primary-soft);color:var(--primary)}
+.transfer-subview{display:none}
+.transfer-subview.active{display:block}
+.composition-toolbar{
+    display:flex;align-items:end;gap:12px;margin-bottom:16px;padding:16px;
+    border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:var(--shadow)
+}
+.composition-toolbar .filter-field{min-width:220px}
+.composition-kpis{grid-template-columns:repeat(5,1fr)}
+.composition-grid{display:grid;gap:14px}
+.composition-card{
+    border:1px solid var(--border);border-radius:16px;background:var(--surface);
+    box-shadow:var(--shadow);overflow:hidden
+}
+.composition-card-header{
+    display:flex;justify-content:space-between;gap:14px;align-items:center;
+    padding:16px 18px;border-bottom:1px solid var(--border)
+}
+.composition-card-title{display:flex;align-items:center;gap:10px}
+.composition-card-title h3{margin:0;font-size:18px}
+.composition-meta{margin-top:4px;color:var(--muted);font-size:12px}
+.composition-status{
+    display:inline-flex;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900
+}
+.composition-status.completa{background:var(--success-bg);color:var(--success)}
+.composition-status.recebimento{background:var(--warning-bg);color:var(--warning)}
+.composition-status.aguardando{background:#f2f4f7;color:#475467}
+.composition-status.pendencia{background:var(--danger-bg);color:var(--danger)}
+.timeline-list{padding:4px 0}
+.timeline-row{
+    display:grid;grid-template-columns:1.25fr 1.4fr .8fr .9fr .55fr .55fr;
+    gap:10px;align-items:center;padding:12px 18px;border-top:1px solid var(--border);font-size:13px
+}
+.timeline-row:first-child{border-top:0}
+.timeline-head{
+    background:var(--surface-soft);color:var(--muted);font-size:11px;
+    font-weight:800;text-transform:uppercase;letter-spacing:.03em
+}
+.timeline-route{font-weight:800}
+.timeline-status{font-weight:800}
+.timeline-status.chegou{color:var(--success)}
+.timeline-status.transito{color:var(--warning)}
+.timeline-status.atrasado{color:var(--danger)}
+@media(max-width:1100px){.composition-kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){
+    .subview-tabs{display:grid;grid-template-columns:1fr 1fr;width:100%}
+    .composition-toolbar{align-items:stretch;flex-direction:column}
+    .composition-toolbar .filter-field{min-width:0;width:100%}
+    .composition-kpis{grid-template-columns:repeat(2,1fr)}
+    .timeline-head{display:none}
+    .timeline-row{grid-template-columns:1fr 1fr;padding:14px 16px}
+    .timeline-row>div::before{display:block;color:var(--muted);font-size:10px;font-weight:800}
+    .timeline-row>div:nth-child(1)::before{content:"Origem"}
+    .timeline-row>div:nth-child(2)::before{content:"Romaneio"}
+    .timeline-row>div:nth-child(3)::before{content:"Previsão"}
+    .timeline-row>div:nth-child(4)::before{content:"Status"}
+    .timeline-row>div:nth-child(5)::before{content:"Notas"}
+    .timeline-row>div:nth-child(6)::before{content:"Volumes"}
+}
