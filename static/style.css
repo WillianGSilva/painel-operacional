@@ -825,3 +825,35 @@ tbody tr[data-romaneio]:hover {
     .timeline-row>div:nth-child(5)::before{content:"Notas"}
     .timeline-row>div:nth-child(6)::before{content:"Volumes"}
 }
+
+
+/* Composition deadline split */
+.deadline-summary{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:14px 18px 4px
+}
+.deadline-box{
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--surface-soft)
+}
+.deadline-box strong{display:block;margin-bottom:4px;font-size:14px}
+.deadline-box span{color:var(--muted);font-size:12px;font-weight:700}
+.deadline-box.today{background:var(--warning-bg)}
+.deadline-box.future{background:var(--primary-soft)}
+.timeline-row{
+    grid-template-columns:1.2fr 1.35fr .7fr .85fr .5fr .5fr .62fr .62fr .7fr .7fr;
+    min-width:1180px
+}
+.timeline-list{overflow-x:auto}
+@media(max-width:760px){
+    .deadline-summary{grid-template-columns:1fr;margin:12px 16px 4px}
+    .timeline-row{min-width:0;grid-template-columns:1fr 1fr}
+    .timeline-row>div:nth-child(7)::before{content:"Notas hoje"}
+    .timeline-row>div:nth-child(8)::before{content:"Vols hoje"}
+    .timeline-row>div:nth-child(9)::before{content:"Notas futuro"}
+    .timeline-row>div:nth-child(10)::before{content:"Vols futuro"}
+}

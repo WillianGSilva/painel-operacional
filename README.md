@@ -61,3 +61,11 @@ N8N_PERFORMANCE_ROMANEIO_DETALHE_URL=http://204.216.191.191:5678/webhook/perform
 ```text
 N8N_COMPOSICAO_SUBREGIOES_URL=http://204.216.191.191:5678/webhook/composicao-subregioes
 ```
+
+
+## V5
+Na composição por sub-região:
+- Total de notas e volumes
+- Vence hoje
+- Prazo futuro
+- A mesma quebra por romaneio

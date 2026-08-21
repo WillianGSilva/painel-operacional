@@ -668,11 +668,35 @@ function renderComposicao(subregioes){
                 </div>
             </div>
 
+            <div class="deadline-summary">
+                <div class="deadline-box">
+                    <strong>Total</strong>
+                    <span>${formatarNumero(s.notas)} notas • ${formatarNumero(s.volumes)} volumes</span>
+                </div>
+                <div class="deadline-box today">
+                    <strong>Vence hoje</strong>
+                    <span>${formatarNumero(s.notas_hoje)} notas • ${formatarNumero(s.volumes_hoje)} volumes</span>
+                </div>
+                <div class="deadline-box future">
+                    <strong>Prazo futuro</strong>
+                    <span>${formatarNumero(s.notas_futuro)} notas • ${formatarNumero(s.volumes_futuro)} volumes</span>
+                </div>
+            </div>
+
             <div class="timeline-list">
                 <div class="timeline-row timeline-head">
-                    <div>Origem</div><div>Romaneio</div><div>Previsão</div>
-                    <div>Status</div><div>Notas</div><div>Volumes</div>
+                    <div>Origem</div>
+                    <div>Romaneio</div>
+                    <div>Previsão</div>
+                    <div>Status</div>
+                    <div>Notas</div>
+                    <div>Volumes</div>
+                    <div>Notas hoje</div>
+                    <div>Vols hoje</div>
+                    <div>Notas futuro</div>
+                    <div>Vols futuro</div>
                 </div>
+
                 ${transferencias.map(t => `
                     <div class="timeline-row">
                         <div class="timeline-route">${origemCurta(t.origem)} → CPS</div>
@@ -683,6 +707,10 @@ function renderComposicao(subregioes){
                         </div>
                         <div>${formatarNumero(t.notas)}</div>
                         <div>${formatarNumero(t.volumes)}</div>
+                        <div><strong>${formatarNumero(t.notas_hoje)}</strong></div>
+                        <div><strong>${formatarNumero(t.volumes_hoje)}</strong></div>
+                        <div>${formatarNumero(t.notas_futuro)}</div>
+                        <div>${formatarNumero(t.volumes_futuro)}</div>
                     </div>
                 `).join("")}
             </div>
